@@ -73,18 +73,40 @@ if($res){
         $x[] = $a;
     }
     foreach($x as $y){
+        $id = $y["id"];
         echo "<br>";
         echo "<div class='postagem'>";
         echo "<center>" . $y["titulo"] . "</center>";
         echo "<p style='text-align: center;'>" . $y["texto"] . "</p>";
         // echo "<h2><a href='#'><i class='fas fa-thumbs-down'></i></a> &emsp; &emsp; &emsp; &emsp;";
         // echo "<a href='#'><i class='fas fa-thumbs-up'></i></a></h2>";
-        echo "<form action =''>"
+        echo "<form action ='' method='post'>";
+        echo "<input type='submit' name='curtir' value='curtir'>";
+        echo "<input type='hidden' name='codigo' value='$id'>";
+        echo "</form>";
         echo "</div>";
-    }
-}
-?>
+       
+          }
+          if(isset($_POST["curtir"])){
+            $curtir = $_POST["curtir"];
+            $codigo = $_POST["codigo"];
+  
+            $sql = "UPDATE teste set curtidas = curtidas + 1 where id = '$codigo'";
+            // $res = mysqli_query($con, $sql);
+            if(mysqli_query($con, $sql)){
+              print "deu certo";
+            }
+            else{
+              print "deu errado";
+              }
+        }
+      }
 
+
+?>
+<script>
+
+</script>
 
 
   <br/>
