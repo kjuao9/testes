@@ -9,7 +9,6 @@
     <!-- Bootstrap CSS -->
     <link rel="shortcut icon" type="image/x-icon" href="imagens/8104logo.ico">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/estilo.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 
    
@@ -18,9 +17,6 @@
   <style>
  body {
     background-color: azure;
-  }
-  .postagem{
-      background-color: lightgrey;
   }
   </style>
 
@@ -42,73 +38,100 @@
 }
 $con = conecta_mysql();
   ?>
-  <form action="" method="get">
-  <label>Título: </label>
-  <input type="text" name="titulo"><br/>
-  <textarea rows="5" cols="21" name="texto" placeholder="texto"></textarea><br/>
-  <p><input type="submit" value="Enviar"><input type="reset" value="Limpar"></p>
-  </form>
+<form action="" method="post">
+
+<input type="titulo" name="titulo" placeholder="titulo da notícia"><br/>
+<textarea name="texto" cols="21" rows="5" placeholder="texto da notícia"></textarea><br/>
+<p>
+<input type="submit" name="enviar" value="enviar">
+<input type="reset" value="limpar">
+</p>
+</form>
 <?php
-if(isset($_GET["titulo"])){
-    $titulo = $_GET["titulo"];
-    $texto = $_GET["texto"];
-    $sql = "INSERT into teste(titulo, texto) values('$titulo', '$texto')";
-    $res = mysqli_query($con, $sql);
-    if($res){
-        echo "<script>
-        alert('Inserção realizada!');
-        </script>";
-    }
-    else{
-        echo "<script>
-        alert('Erro ao realizar inserção');
-        </script>";
-    }
+if(isset($_POST["titulo"])){
+  $titulo = $_POST["titulo"];
+  $texto = $_POST["texto"];
+  $novonome = md5(microtime());
+  $destino = 'arquivos/'.$novonome.".php"; 
+  $noticia = "$titulo\n$texto";
+
+  $a = "<head>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>
+  </head>
+  <style>
+.borda{
+  border: 1px;
+  border-style: solid;
 }
+.bordap{
+  border: 1px;
+  padding: 5px;
+  border-style: solid;
+  border-color: red;
+  text-align: justify;
+}
+.imagem{
+height: 230px;
+width: 230px;
+float: right;
+padding: 10px;
+}
+.clear{
+  clear: both;
+}
+.clearfix{
+  overflow: auto;
+}
+.justifica{
+  text-align: justify;
+}
+body {
+    background-color: azure;
+  }
+#noticia{
+    background-color: #e9ecefbd;
+  }
+#comentarios{
+  background-color: lightgrey;
+}
+  </style>
+  <div class='container borda clearfix' id='noticia'>
+  <p><br/><br/>
+ <h2 class='font-weight-light text-center text-lg-center mt-4 mb-0 centro'>" . $titulo . "</h2>
+  </p><hr>
+  <div class='justifica'><p style='font-size: 20px;'>".$texto."
+ </p><i>Postado por: <b>João</b> &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;data da postagem: 16/11/2019</i></div></div>";
+ 
+
+  $myfile = fopen($destino, "w");
+  fwrite($myfile, $a);
+  fclose($myfile);
+
+ $sql = "INSERT into teste(titulo, texto, endereco) values ('$titulo', '$texto', '$destino')";
+ if(mysqli_query($con, $sql)){
+   print "noticia inserida";
+ }
+ else{
+   print "erro ao inserir noticia :-(";
+ }
+}
+
+//indo no bd e pegando todas as noticias
 $sql = "SELECT * from teste";
 $res = mysqli_query($con, $sql);
 if($res){
-    $x = array();
-    while($a = mysqli_fetch_assoc($res)){
-        $x[] = $a;
-    }
-    foreach($x as $y){
-        $id = $y["id"];
-        echo "<br>";
-        echo "<div class='postagem'>";
-        echo "<center>" . $y["titulo"] . "</center>";
-        echo "<p style='text-align: center;'>" . $y["texto"] . "</p>";
-        // echo "<h2><a href='#'><i class='fas fa-thumbs-down'></i></a> &emsp; &emsp; &emsp; &emsp;";
-        // echo "<a href='#'><i class='fas fa-thumbs-up'></i></a></h2>";
-        echo "<form action ='' method='post'>";
-        echo "<input type='submit' name='curtir' value='curtir'>";
-        echo "<input type='hidden' name='codigo' value='$id'>";
-        echo "</form>";
-        echo "</div>";
-       
-          }
-          if(isset($_POST["curtir"])){
-            $curtir = $_POST["curtir"];
-            $codigo = $_POST["codigo"];
-  
-            $sql = "UPDATE teste set curtidas = curtidas + 1 where id = '$codigo'";
-            // $res = mysqli_query($con, $sql);
-            if(mysqli_query($con, $sql)){
-              print "deu certo";
-            }
-            else{
-              print "deu errado";
-              }
-        }
-      }
-
-
+  $x = array();
+  while($y = mysqli_fetch_assoc($res)){
+    $x[] = $y;
+  }
+  foreach($x as $z){
+    $title = $z["titulo"];
+    $caminho = $z["endereco"];
+    include_once "$caminho";
+    echo "<a href='$caminho'>$title</a>";
+  }
+}
 ?>
-<script>
-
-</script>
-
-
   <br/>
   <br/>
   <br/>
